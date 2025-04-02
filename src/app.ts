@@ -24,6 +24,15 @@ interface BotState {
 // Ensure directories exist
 mkdirSync(LANDING_PAGES_DIR, { recursive: true });
 
+function validateState(state: any): BotState {
+  return {
+    lastCheckedTime: typeof state?.lastCheckedTime === 'string' ? state.lastCheckedTime : new Date().toISOString(),
+    processedCasts: Array.isArray(state?.processedCasts) ? state.processedCasts : [],
+    lastGeminiCall: typeof state?.lastGeminiCall === 'string' ? state.lastGeminiCall : undefined,
+    geminiRequestQueue: Array.isArray(state?.geminiRequestQueue) ? state.geminiRequestQueue : []
+  };
+}
+
 let botState: BotState = {
   lastCheckedTime: new Date().toISOString(),
   processedCasts: [],
@@ -31,18 +40,39 @@ let botState: BotState = {
 };
 
 if (existsSync(STATE_FILE)) {
-  botState = JSON.parse(readFileSync(STATE_FILE, 'utf-8'));
+  try {
+    botState = validateState(JSON.parse(readFileSync(STATE_FILE, 'utf-8')));
+  } catch (err) {
+    console.error("Error loading state file, using defaults:", err);
+  }
 }
 
 const saveState = () => {
-  // Clean up old requests before saving
-  const now = Date.now();
-  botState.geminiRequestQueue = botState.geminiRequestQueue.filter(
-    timestamp => now - timestamp < 5000
-  );
-  
-  writeFileSync(STATE_FILE, JSON.stringify(botState));
-  writeFileSync(STATE_FILE + '.bak', JSON.stringify(botState));
+  try {
+    // Ensure we have valid arrays before operating on them
+    if (!Array.isArray(botState.geminiRequestQueue)) {
+      botState.geminiRequestQueue = [];
+    }
+
+    if (!Array.isArray(botState.processedCasts)) {
+      botState.processedCasts = [];
+    }
+
+    // Clean up old requests before saving
+    const now = Date.now();
+    botState.geminiRequestQueue = botState.geminiRequestQueue
+      .filter(timestamp => now - timestamp < 5000);
+
+    // Limit processed casts to prevent memory issues
+    if (botState.processedCasts.length > 1000) {
+      botState.processedCasts = botState.processedCasts.slice(-1000);
+    }
+
+    writeFileSync(STATE_FILE, JSON.stringify(botState));
+    writeFileSync(STATE_FILE + '.bak', JSON.stringify(botState));
+  } catch (err) {
+    console.error("Error saving state:", err);
+  }
 };
 
 // Fallback Template Generator
@@ -112,9 +142,8 @@ const generateLandingPage = async (params: {
   try {
     // Rate limiting - clear old requests
     const now = Date.now();
-    botState.geminiRequestQueue = botState.geminiRequestQueue.filter(
-      timestamp => now - timestamp < 1000
-    );
+    botState.geminiRequestQueue = (botState.geminiRequestQueue || [])
+      .filter(timestamp => now - timestamp < 1000);
 
     // If we have recent requests, wait
     if (botState.geminiRequestQueue.length >= 1) {
@@ -186,7 +215,6 @@ const saveLandingPage = (html: string, authorFid: number): string => {
 };
 
 // Mention Handling
-// Mention Handling
 const checkMentionsAndReply = async () => {
   try {
     const { notifications } = await neynarClient.fetchAllNotifications({
@@ -244,7 +272,6 @@ const checkMentionsAndReply = async () => {
       } catch (err) {
         console.error("Error processing cast:", err);
         
-        // Only try to reply if we have a valid cast reference
         if (notification?.cast?.hash && notification.cast.author?.username) {
           if (err instanceof Error && err.message.includes("Rate limited")) {
             await neynarClient.publishCast({

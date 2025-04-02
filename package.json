@@ -1,15 +1,16 @@
 {
   "name": "gm_bot",
   "version": "1.0.0",
-  "description": "A bot that will cast a 'gm 🪐' message in Warpcast at scheduled time everyday (As long as system is online)",
+  "description": "A bot that will cast a 'gm 🪐' message in Warpcast at scheduled time everyday and generate landing pages",
   "main": "./dist/app.js",
   "scripts": {
     "watch": "tsc --watch",
-    "clean": "rimraf dist",
-    "build": "npm run clean && tsc",
+    "clean": "rimraf dist landing-pages",
+    "build": "npm run clean && tsc && mkdir -p dist/landing-pages",
     "start": "npm run build && node dist/app.js",
     "get-approved-signer": "ts-node getApprovedSigner.ts",
-    "vercel-build": "npm run build"
+    "vercel-build": "npm run build && cp -r src/landing-pages/* dist/landing-pages/",
+    "test": "jest"
   },
   "author": "Neynar",
   "license": "MIT",
@@ -21,12 +22,16 @@
     "dotenv": "^16.4.7",
     "node-cron": "^3.0.3",
     "typescript": "^5.7.2",
-    "viem": "^2.21.57"
+    "viem": "^2.21.57",
+    "fs-extra": "^11.2.0"
   },
   "devDependencies": {
     "@types/node": "^22.13.17",
     "@types/node-cron": "^3.0.11",
     "rimraf": "^5.0.10",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "@types/jest": "^29.5.12",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2"
   }
 }

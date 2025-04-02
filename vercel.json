@@ -6,18 +6,27 @@
       "use": "@vercel/node"
     },
     {
-      "src": "landing-pages/*.html",
+      "src": "landing-pages/**/*.html",
       "use": "@vercel/static"
     }
   ],
   "routes": [
     {
       "src": "/landing-pages/(.*)",
-      "dest": "/landing-pages/$1"
+      "dest": "/landing-pages/$1",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "Content-Type": "text/html"
+      }
     },
     {
       "src": "/api/(.*)",
       "dest": "/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/landing-pages/$1",
+      "continue": true
     }
   ]
 }
