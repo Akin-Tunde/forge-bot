@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "public": true,
+  "rewrites": [
+    { 
+      "source": "/landing-pages/(.*)", 
+      "destination": "/landing-pages/$1" 
+    }
+  ],
+  "functions": {
+    "api/**": {
+      "memory": 1024,
+      "maxDuration": 15
+    }
+  }
+}

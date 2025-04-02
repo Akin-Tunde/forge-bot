@@ -1,0 +1,28 @@
+{
+  "name": "gm_bot",
+  "version": "1.0.0",
+  "description": "A bot that will cast a 'gm 🪐' message in Warpcast at scheduled time everyday (As long as system is online)",
+  "main": "./dist/app.js",
+  "scripts": {
+    "watch": "tsc --watch",
+    "build": "rmdir /s /q dist && tsc",
+    "start": "npm run build && node dist/app.js",
+    "get-approved-signer": "ts-node getApprovedSigner.ts"
+  },
+  "author": "Neynar",
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "@google/generative-ai": "^0.24.0",
+    "@neynar/nodejs-sdk": "^2.7.0",
+    "dotenv": "^16.4.7",
+    "node-cron": "^3.0.3",
+    "typescript": "^5.7.2",
+    "viem": "^2.21.57"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.17",
+    "@types/node-cron": "^3.0.11",
+    "ts-node": "^10.9.2"
+  }
+}
