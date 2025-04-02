@@ -5,9 +5,11 @@
   "main": "./dist/app.js",
   "scripts": {
     "watch": "tsc --watch",
-    "build": "rmdir /s /q dist && tsc",
+    "clean": "rimraf dist",
+    "build": "yarn clean && tsc",
     "start": "npm run build && node dist/app.js",
-    "get-approved-signer": "ts-node getApprovedSigner.ts"
+    "get-approved-signer": "ts-node getApprovedSigner.ts",
+    "vercel-build": "yarn build"
   },
   "author": "Neynar",
   "license": "MIT",
@@ -24,6 +26,7 @@
   "devDependencies": {
     "@types/node": "^22.13.17",
     "@types/node-cron": "^3.0.11",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "rimraf": "^5.0.5"
   }
 }
