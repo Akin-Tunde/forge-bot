@@ -6,10 +6,12 @@
   "scripts": {
     "watch": "tsc --watch",
     "clean": "rimraf dist landing-pages",
-    "build": "npm run clean && tsc && mkdir -p dist/landing-pages",
-    "start": "npm run build && node dist/app.js",
+    "prebuild": "npm run clean",
+    "build": "tsc && npm run build-scripts",
+  "build-scripts": "tsc scripts/prepare-dist.ts scripts/copy-assets.ts --outDir dist/scripts",
+    "start": "node dist/app.js",
     "get-approved-signer": "ts-node getApprovedSigner.ts",
-    "vercel-build": "npm run build && cp -r src/landing-pages/* dist/landing-pages/",
+    "vercel-build": "npm run build && node dist/scripts/copy-assets.js",
     "test": "jest"
   },
   "author": "Neynar",
@@ -23,10 +25,11 @@
     "node-cron": "^3.0.3",
     "typescript": "^5.7.2",
     "viem": "^2.21.57",
-    "fs-extra": "^11.2.0"
+    "fs-extra": "^11.2.0",
+    "cross-env": "^7.0.3"
   },
   "devDependencies": {
-    "@types/node": "^22.13.17",
+    "@types/node": "^20.11.19",
     "@types/node-cron": "^3.0.11",
     "rimraf": "^5.0.10",
     "ts-node": "^10.9.2",
