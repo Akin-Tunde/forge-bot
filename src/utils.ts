@@ -1,3 +1,5 @@
+//src/utils.ts
+
 import { FARCASTER_BOT_MNEMONIC } from "./config";
 import neynarClient from "./neynarClient";
 import { mnemonicToAccount } from "viem/accounts";

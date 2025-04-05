@@ -1,3 +1,5 @@
+//src/neynarClient.ts
+
 import { createPublicClient, http } from "viem";
 import { optimism } from "viem/chains";
 
